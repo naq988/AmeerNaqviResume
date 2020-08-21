@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+
+
+  Counter:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: function.handler
+      Runtime: python3.8
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        HttpGet:
+          Type: Api
+          Properties:
+            Path: '/counter'
+            Method: get
+            
+            
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      BucketName: ameernaqvi.com
+      CorsConfiguration:
+        CorsRules:
+          - 
+            AllowedMethods: 
+              - GET
+              - HEAD
+            AllowedOrigins: 
+              - "*"
+            AllowedHeaders: 
+              - "*"
+              
+              
+  NaqviResumeCounterDynamodb: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "Site"
+          AttributeType: "N"
+      KeySchema: 
+        - 
+          AttributeName: "Site"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "1"
+        WriteCapacityUnits: "1"
+      TableName: "naqviresumecounter"
+      
+      
+  Outputs:
+  MyEndPoints:
+    Description: "The API endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/counter/" 
